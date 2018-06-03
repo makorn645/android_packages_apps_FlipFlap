@@ -55,12 +55,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.lineageos.internal.util.LineageLockPatternUtils;
-import lineageos.providers.LineageSettings;
 
 public class FlipFlapView extends FrameLayout {
     private static final String TAG = "FlipFlapView";
     private static final String KEY_PASS_TO_SECURITY = "pass_to_security_view";
-    private static final String KEY_TOUCH_SENSITIVITY = "use_high_touch_sensitivity";
 
     private static final int COVER_CLOSED_MSG = 0;
     private static final int RESTORE_SECURITY_VIEW_STATE = 1;
@@ -77,8 +75,6 @@ public class FlipFlapView extends FrameLayout {
     private boolean mProximityNear;
     private boolean mNotificationListenerRegistered;
     private boolean mPassToSecurity;
-
-    private int mUserHighTouchState;
 
     /* Required to only read the setting when it's already restored, else when closing the cover
     within the timeout (1.5s), it would read "true" (because we set it) and always restore that */
@@ -103,7 +99,6 @@ public class FlipFlapView extends FrameLayout {
         mWakeLock.setReferenceCounted(false);
 
         changeSecurityViewState();
-        checkHighTouchSensitivity();
     }
 
     protected boolean canUseProximitySensor() {
@@ -203,7 +198,6 @@ public class FlipFlapView extends FrameLayout {
         mHandler.removeCallbacksAndMessages(null);
         getContext().unregisterReceiver(mReceiver);
         restoreSecurityViewState();
-        restoreHighTouchSensitivity();
 
         if (supportsNotifications()) {
             try {
@@ -417,28 +411,6 @@ public class FlipFlapView extends FrameLayout {
     private void setPassToSecurityView(boolean enabled) {
         LineageLockPatternUtils llpu = new LineageLockPatternUtils(mContext);
         llpu.setPassToSecurityView(enabled, getUserId());
-    }
-
-    private void checkHighTouchSensitivity() {
-        if (shouldUseHighTouchSensitivity() &&
-                FlipFlapUtils.getHighTouchSensitivitySupported(getContext())) {
-            mUserHighTouchState = LineageSettings.System.getInt(mContext.getContentResolver(),
-                    LineageSettings.System.HIGH_TOUCH_SENSITIVITY_ENABLE, 0);
-            LineageSettings.System.putInt(mContext.getContentResolver(),
-                    LineageSettings.System.HIGH_TOUCH_SENSITIVITY_ENABLE, 1);
-        }
-    }
-
-    private void restoreHighTouchSensitivity() {
-        if (shouldUseHighTouchSensitivity() &&
-                FlipFlapUtils.getHighTouchSensitivitySupported(getContext())) {
-            LineageSettings.System.putInt(mContext.getContentResolver(),
-                    LineageSettings.System.HIGH_TOUCH_SENSITIVITY_ENABLE, mUserHighTouchState);
-        }
-    }
-
-    private boolean shouldUseHighTouchSensitivity() {
-        return FlipFlapUtils.getPreferences(mContext).getBoolean(KEY_TOUCH_SENSITIVITY, false);
     }
 
     private int getUserId() {
