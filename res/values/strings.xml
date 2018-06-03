@@ -58,4 +58,8 @@
     <string name="timeout_entry_1min">1 minute</string>
     <string name="timeout_entry_5min">5 minutes</string>
     <string name="timeout_entry_never">Never</string>
+
+    <string name="switch_bar_on">On</string>
+    <string name="switch_bar_off">Off</string>
+
 </resources>
