@@ -48,13 +48,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.android.internal.widget.LockPatternUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import org.lineageos.internal.util.LineageLockPatternUtils;
 
 public class FlipFlapView extends FrameLayout {
     private static final String TAG = "FlipFlapView";
@@ -66,6 +66,7 @@ public class FlipFlapView extends FrameLayout {
     private Context mContext;
     private CallState mCallState;
     private GestureDetector mDetector;
+    private LockPatternUtils mLockPatternUtils;
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
     private SensorManager mSensorManager;
@@ -94,7 +95,6 @@ public class FlipFlapView extends FrameLayout {
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mTelecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
         mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
         mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, TAG);
         mWakeLock.setReferenceCounted(false);
 
@@ -404,13 +404,13 @@ public class FlipFlapView extends FrameLayout {
     }
 
     private boolean shouldPassToSecurityView() {
-        LineageLockPatternUtils llpu = new LineageLockPatternUtils(mContext);
-        return llpu.shouldPassToSecurityView(getUserId());
+        mLockPatternUtils = new LockPatternUtils(mContext);
+        return mLockPatternUtils.shouldPassToSecurityView(getUserId());
     }
 
     private void setPassToSecurityView(boolean enabled) {
-        LineageLockPatternUtils llpu = new LineageLockPatternUtils(mContext);
-        llpu.setPassToSecurityView(enabled, getUserId());
+        mLockPatternUtils = new LockPatternUtils(mContext);
+        mLockPatternUtils.setPassToSecurityView(enabled, getUserId());
     }
 
     private int getUserId() {
